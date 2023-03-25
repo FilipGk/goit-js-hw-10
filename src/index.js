@@ -9,6 +9,34 @@ const searchBox = document.querySelector('#search-box');
 const countryInfo = document.querySelector('.country-info');
 const countryList = document.querySelector('.country-list');
 
+const cleanMarkup = ref => (ref.innerHTML = '');
+
+const inputHandler = event => {
+  const textInput = event.target.value.trim();
+
+  if (!textInput) {
+    cleanMarkup(countryList);
+    cleanMarkup(countryInfo);
+    return;
+  }
+
+  fetchCountries(textInput)
+    .then(data => {
+      if (data.length > 10) {
+        Notiflix.Notify.info(
+          'Too many matches found. Please enter a more specific name'
+        );
+        return;
+      }
+      renderMarkup(data);
+    })
+    .catch(err => {
+      cleanMarkup(countryList);
+      cleanMarkup(countryInfo);
+      Notiflix.Notify.failure('Oops, there is no country with that name');
+    });
+};
+
 const renderMarkup = data => {
   if (data.length === 1) {
     cleanMarkup(countryList);
